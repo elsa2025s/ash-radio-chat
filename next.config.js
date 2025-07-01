@@ -7,7 +7,7 @@ const nextConfig = {
     ignoreBuildErrors: true,
   },
   output: 'export',
-  distDir: 'out',
+    distDir: 'output/out', // <-- CHANGEMENT ICI
   trailingSlash: true,
   images: {
     unoptimized: true
