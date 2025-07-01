@@ -1,10 +1,9 @@
 [build]
   command = "bun run build"
-  publish = "output/out" # C'est la ligne qui a été modifiée
+  publish = "output/out"
   environment = {
-    NODE_VERSION = "20"
+    NODE_VERSION = "20" # Ou "18" si vous préférez, mais assurez-vous de n'avoir que ceci sur la ligne
   }
-
 [[plugins]]
   package = "@netlify/plugin-nextjs"
 
