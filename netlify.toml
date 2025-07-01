@@ -1,10 +1,11 @@
 [images]
   remote_images = ["https://source.unsplash.com/.*", "https://images.unsplash.com/.*", "https://ext.same-assets.com/.*", "https://ugc.same-assets.com/.*"]
-
 [build]
   command = "bun run build"
-  publish = "out"
-
+  publish = "output/out" # <-- C'EST ICI LE CHANGEMENT
+  environment = {
+    NODE_VERSION = "18" # Vous aviez 20 avant, je laisse 18 si c'est ce que vous voulez utiliser
+  }
 [build.environment]
   NODE_VERSION = "18"
   
