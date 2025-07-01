@@ -1,4 +1,4 @@
-"@radix-ui/react-scroll-area": "^1.0.5""@radix-ui/react-scroll-area": "^1.0.5""@radix-ui/react-scroll-area": "^1.0.5"{
+{
   "name": "ash-radio-chat",
   "version": "1.0.0",
   "description": "Tchat communautaire pour Ash-Radio",
