@@ -1,14 +1,9 @@
-[images]
-  remote_images = ["https://source.unsplash.com/.*", "https://images.unsplash.com/.*", "https://ext.same-assets.com/.*", "https://ugc.same-assets.com/.*"]
 [build]
   command = "bun run build"
-  publish = "output/out" # <-- C'EST ICI LE CHANGEMENT
+  publish = "output/out" # C'est la ligne qui a été modifiée
   environment = {
-    NODE_VERSION = "18" # Vous aviez 20 avant, je laisse 18 si c'est ce que vous voulez utiliser
+    NODE_VERSION = "18"
   }
-[build.environment]
-  NODE_VERSION = "18"
-  
 
 [[plugins]]
   package = "@netlify/plugin-nextjs"
