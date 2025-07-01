@@ -1,0 +1,268 @@
+// Ash-Radio Enterprise Database Schema
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  ADMIN
+  MODERATOR
+  USER
+  BANNED
+}
+
+enum ChannelType {
+  PUBLIC
+  PRIVATE
+  THEMATIC
+  VOICE
+}
+
+enum MessageType {
+  TEXT
+  IMAGE
+  AUDIO
+  SYSTEM
+  COMMAND
+}
+
+enum ModerationAction {
+  WARN
+  MUTE
+  KICK
+  BAN
+  UNBAN
+  UNMUTE
+}
+
+// ===== UTILISATEURS =====
+model User {
+  id              String   @id @default(cuid())
+  username        String   @unique
+  email           String   @unique
+  passwordHash    String
+
+  // Profil
+  avatar          String?
+  bio             String?
+  joinedAt        DateTime @default(now())
+  lastSeen        DateTime @default(now())
+
+  // Système de rôles
+  role            UserRole @default(USER)
+
+  // Système XP et niveaux
+  xp              Int      @default(0)
+  level           Int      @default(1)
+  reputation      Int      @default(0)
+
+  // Statistiques
+  messagesCount   Int      @default(0)
+  voiceTime       Int      @default(0) // en secondes
+  connectTime     Int      @default(0) // en secondes
+
+  // Relations
+  messages        Message[]
+  channelMembers  ChannelMember[]
+  sentInvitations ChannelInvitation[] @relation("InvitationSender")
+  receivedInvitations ChannelInvitation[] @relation("InvitationReceiver")
+  moderationActions ModerationLog[] @relation("ModeratorActions")
+  receivedActions   ModerationLog[] @relation("UserActions")
+  userAchievements UserAchievement[]
+
+  @@map("users")
+}
+
+// ===== CHANNELS/SALLES =====
+model Channel {
+  id          String      @id @default(cuid())
+  name        String      @unique
+  description String?
+  topic       String?
+
+  type        ChannelType @default(PUBLIC)
+  isPrivate   Boolean     @default(false)
+  password    String?     // Pour les salles protégées
+
+  // Propriétaire du channel
+  ownerId     String
+
+  // Métadonnées
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  isActive    Boolean     @default(true)
+
+  // Paramètres
+  maxMembers  Int?        @default(100)
+  slowMode    Int?        @default(0) // Délai entre messages en secondes
+
+  // Relations
+  messages    Message[]
+  members     ChannelMember[]
+  invitations ChannelInvitation[]
+
+  @@map("channels")
+}
+
+model ChannelMember {
+  id        String   @id @default(cuid())
+  userId    String
+  channelId String
+
+  // Permissions dans le channel
+  canWrite  Boolean  @default(true)
+  canInvite Boolean  @default(false)
+  isMuted   Boolean  @default(false)
+  muteUntil DateTime?
+
+  joinedAt  DateTime @default(now())
+
+  // Relations
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  channel   Channel  @relation(fields: [channelId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, channelId])
+  @@map("channel_members")
+}
+
+model ChannelInvitation {
+  id          String   @id @default(cuid())
+  channelId   String
+  senderId    String
+  receiverId  String
+
+  message     String?
+  isAccepted  Boolean?
+
+  createdAt   DateTime @default(now())
+  expiresAt   DateTime
+
+  // Relations
+  channel     Channel @relation(fields: [channelId], references: [id], onDelete: Cascade)
+  sender      User    @relation("InvitationSender", fields: [senderId], references: [id])
+  receiver    User    @relation("InvitationReceiver", fields: [receiverId], references: [id])
+
+  @@map("channel_invitations")
+}
+
+// ===== MESSAGES =====
+model Message {
+  id        String      @id @default(cuid())
+  content   String
+  type      MessageType @default(TEXT)
+
+  // Métadonnées
+  userId    String
+  channelId String
+  createdAt DateTime    @default(now())
+  editedAt  DateTime?
+
+  // Médias
+  mediaUrl  String?     // URL pour images/audio
+  mediaType String?     // MIME type
+  mediaSize Int?        // Taille en bytes
+
+  // Système de réactions
+  reactions Json?       // {"👍": ["userId1", "userId2"], "❤️": ["userId3"]}
+
+  // Réponses/Threads
+  replyToId String?
+
+  // Relations
+  user      User     @relation(fields: [userId], references: [id])
+  channel   Channel  @relation(fields: [channelId], references: [id], onDelete: Cascade)
+  replyTo   Message? @relation("MessageReplies", fields: [replyToId], references: [id])
+  replies   Message[] @relation("MessageReplies")
+
+  @@index([channelId, createdAt])
+  @@index([userId])
+  @@map("messages")
+}
+
+// ===== MODÉRATION =====
+model ModerationLog {
+  id          String           @id @default(cuid())
+  action      ModerationAction
+  reason      String?
+  duration    Int?             // Durée en secondes pour mute/ban temporaire
+
+  // Acteurs
+  moderatorId String
+  userId      String
+  channelId   String?
+
+  // Métadonnées
+  createdAt   DateTime         @default(now())
+  expiresAt   DateTime?        // Pour les sanctions temporaires
+  isActive    Boolean          @default(true)
+
+  // Relations
+  moderator   User    @relation("ModeratorActions", fields: [moderatorId], references: [id])
+  user        User    @relation("UserActions", fields: [userId], references: [id])
+
+  @@map("moderation_logs")
+}
+
+// ===== SYSTÈME XP & ACHIEVEMENTS =====
+model Achievement {
+  id          String @id @default(cuid())
+  name        String @unique
+  description String
+  icon        String
+  xpReward    Int
+
+  // Conditions
+  condition   Json   // {"type": "messages", "count": 100} ou {"type": "days", "count": 30}
+
+  // Relations
+  userAchievements UserAchievement[]
+
+  @@map("achievements")
+}
+
+model UserAchievement {
+  id            String      @id @default(cuid())
+  userId        String
+  achievementId String
+  unlockedAt    DateTime    @default(now())
+
+  // Relations
+  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  achievement   Achievement @relation(fields: [achievementId], references: [id])
+
+  @@unique([userId, achievementId])
+  @@map("user_achievements")
+}
+
+// ===== STATISTIQUES =====
+model DailyStats {
+  id              String   @id @default(cuid())
+  date            DateTime @unique @db.Date
+
+  // Statistiques générales
+  activeUsers     Int      @default(0)
+  newUsers        Int      @default(0)
+  totalMessages   Int      @default(0)
+  totalVoice      Int      @default(0)
+
+  // Par channel
+  channelStats    Json?    // {"channelId": {"messages": 50, "users": 10}}
+
+  @@map("daily_stats")
+}
+
+// ===== CONFIGURATION =====
+model ServerConfig {
+  id          String   @id @default(cuid())
+  key         String   @unique
+  value       String
+  description String?
+  updatedAt   DateTime @updatedAt
+  updatedBy   String?
+
+  @@map("server_config")
+}

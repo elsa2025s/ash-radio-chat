@@ -1,0 +1,56 @@
+{
+  "rules": {
+    ".read": false,
+    ".write": false,
+
+    "channels": {
+      ".read": "auth != null",
+      ".write": false,
+      "$channelId": {
+        ".validate": "newData.hasChildren(['id', 'name', 'description', 'topic', 'color'])"
+      }
+    },
+
+    "messages": {
+      "$channelId": {
+        ".read": "auth != null",
+        ".write": "auth != null",
+        "$messageId": {
+          ".validate": "newData.hasChildren(['userId', 'username', 'content', 'type', 'timestamp', 'channel']) && auth.uid == newData.child('userId').val()"
+        }
+      }
+    },
+
+    "channelUsers": {
+      "$channelId": {
+        ".read": "auth != null",
+        "$userId": {
+          ".write": "auth != null && auth.uid == $userId",
+          ".validate": "newData.hasChildren(['id', 'username', 'avatar', 'role', 'color', 'status'])"
+        }
+      }
+    },
+
+    "users": {
+      "$userId": {
+        ".read": "auth != null && auth.uid == $userId",
+        ".write": "auth != null && auth.uid == $userId",
+        ".validate": "newData.hasChildren(['id', 'username', 'email', 'avatar', 'color', 'role'])"
+      }
+    },
+
+    "typing": {
+      "$channelId": {
+        ".read": "auth != null",
+        "$userId": {
+          ".write": "auth != null && auth.uid == $userId"
+        }
+      }
+    },
+
+    "banned": {
+      ".read": "auth != null",
+      ".write": false
+    }
+  }
+}
