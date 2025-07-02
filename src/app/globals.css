@@ -1,0 +1,125 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 216 23% 8%;
+    --foreground: 0 0% 98%;
+    --card: 216 20% 10%;
+    --card-foreground: 0 0% 98%;
+    --popover: 216 20% 10%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 0 84% 56%;
+    --primary-foreground: 0 0% 98%;
+    --secondary: 0 0% 15%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 216 15% 15%;
+    --muted-foreground: 0 0% 65%;
+    --accent: 0 50% 40%;
+    --accent-foreground: 0 0% 98%;
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 216 15% 20%;
+    --input: 216 15% 15%;
+    --ring: 215 84% 56%;
+    --radius: 0.75rem;
+    --chart-1: 0 84% 56%;
+    --chart-2: 0 50% 35%;
+    --chart-3: 0 73% 70%;
+    --chart-4: 0 30% 25%;
+    --chart-5: 0 90% 65%;
+
+    /* ASH Radio custom colors - Rouge et Noir */
+    --ash-red: 0 84% 56%;
+    --ash-red-dark: 0 73% 35%;
+    --ash-red-light: 0 84% 70%;
+    --ash-dark: 0 0% 8%;
+    --ash-dark-lighter: 0 0% 12%;
+  }
+
+  .dark {
+    --background: 216 23% 8%;
+    --foreground: 0 0% 98%;
+    --card: 216 20% 10%;
+    --card-foreground: 0 0% 98%;
+    --popover: 216 20% 10%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 0 84% 56%;
+    --primary-foreground: 0 0% 98%;
+    --secondary: 0 0% 15%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 216 15% 15%;
+    --muted-foreground: 0 0% 65%;
+    --accent: 0 50% 40%;
+    --accent-foreground: 0 0% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 216 15% 20%;
+    --input: 216 15% 15%;
+    --ring: 215 84% 56%;
+    --chart-1: 0 84% 56%;
+    --chart-2: 0 50% 35%;
+    --chart-3: 0 73% 70%;
+    --chart-4: 0 30% 25%;
+    --chart-5: 0 90% 65%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground font-sans;
+    background: linear-gradient(135deg, hsl(var(--ash-dark)) 0%, hsl(var(--ash-dark-lighter)) 100%);
+    min-height: 100vh;
+  }
+}
+
+@layer utilities {
+  .ash-gradient {
+    background: linear-gradient(135deg, hsl(var(--ash-red)) 0%, hsl(var(--ash-red-dark)) 100%);
+  }
+
+  .ash-text-gradient {
+    background: linear-gradient(135deg, hsl(var(--ash-red)) 0%, hsl(var(--ash-red-light)) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .glass-effect {
+    backdrop-filter: blur(10px);
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .radio-wave {
+    position: relative;
+  }
+
+  .radio-wave::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 100%;
+    height: 100%;
+    border: 2px solid hsl(var(--ash-red));
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0% {
+      transform: translate(-50%, -50%) scale(1);
+      opacity: 1;
+    }
+    100% {
+      transform: translate(-50%, -50%) scale(1.5);
+      opacity: 0;
+    }
+  }
+}

@@ -1,0 +1,31 @@
+User-agent: *
+Allow: /
+
+# Pages principales
+Allow: /musique
+Allow: /emissions
+Allow: /animateurs
+Allow: /podcasts
+Allow: /chatroom
+Allow: /evenements
+Allow: /contact
+
+# Ressources statiques
+Allow: /icons/
+Allow: /screenshots/
+Allow: /_next/static/
+
+# Fichiers PWA
+Allow: /manifest.json
+Allow: /sw.js
+
+# Désindexer les fichiers techniques
+Disallow: /_next/
+Disallow: /api/
+Disallow: /.well-known/
+
+# Sitemap
+Sitemap: https://ashradio-direct.com/sitemap.xml
+
+# Crawl-delay pour éviter la surcharge
+Crawl-delay: 1
